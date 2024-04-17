@@ -1,44 +1,57 @@
-#include<iostream>
-#include<vector>
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <functional>
+
 using namespace std;
 
-/*
-Ucitati sekvencu Trouglova. Trougao je zadat duzinama njegovih stranica. Ne ucitavati
-trougao ako vec postoji.
-*/
-
 class Triangle {
-	int a, b, c;
+
 public:
+	int a, b, c;
 	Triangle(int a, int b, int c) :a(a), b(b), c(c) {}
-	bool operator==(Triangle other) {
+	bool operator==(const Triangle& other) const {
 		return a == other.a && b == other.b && c == other.c;
 	}
-	void print() {
+	void print() const {
 		cout << a << " " << b << " " << c << endl;
 	}
 };
 
-void loadTriangle(Triangle t, vector<Triangle>& v) {
-	for (int i = 0;i < v.size();i++)
-		if (t == v[i]) return;
-	v.push_back(t);
-}
+class TriangleHash {
+public:
+	size_t operator()(const Triangle& t)const {
+		size_t h = 0;
+		h = 19 * h + hash<int>()(t.a);
+		h = 19 * h + hash<int>()(t.b);
+		h = 19 * h + hash<int>()(t.b);
+		return h;
+	}
+};
+
+class TriangleCompare {
+public:
+	bool operator()(const Triangle& a, const Triangle& b) const {
+		return a.a == b.a && a.b == b.b && a.c == b.c;
+	}
+};
 
 int main() {
+	unordered_map<Triangle, int, TriangleHash, TriangleCompare> map;
 
-	vector<Triangle> v;
-	
-	for (int i = 0;i < 20;i++) {
+	for (int i = 0; i < 10; i++) {
 		int a = rand() % 2;
 		int b = rand() % 2;
 		int c = rand() % 2;
 		Triangle t = Triangle(a, b, c);
-		loadTriangle(Triangle(a, b, c), v);
+		auto it = map.find(t);
+		if (it == map.end()) {
+			map[t] = 1;
+		}
 	}
 
-	for (int i = 0;i < v.size();i++)
-		v[i].print();
+	for (const auto& t : map)
+		t.first.print();
 
 	return 0;
 }

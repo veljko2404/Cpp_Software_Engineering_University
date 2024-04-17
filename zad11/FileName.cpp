@@ -1,53 +1,57 @@
 #include<iostream>
-#include<unordered_map>
 #include<vector>
 using namespace std;
 
 /*
-Ucitati sekvencu Trouglova. Trougao je zadat duzinama njegovih stranica. Za
-svaki ucitani trougao ispisati koliko je istih trouglova vec ucitano.
+Napisati sablonsku metodu koja nalazi najduzi uzatopni podniz datog vektora za koji vazi (a1 < a2 > a3 < a4 > a5 <...).
+Ulaz
+1 1 2 2 2 3 2 2 
+Izlaz
+2 3 2
 */
 
-class Triangle { 
-public:
-	int a, b, c;
-	Triangle(int a, int b, int c) :a(a), b(b), c(c) {}
-	bool operator==(Triangle other) const {
-		return a == other.a && b == other.b && c == other.c;
-	}
-	void print() const {
-		cout << a << " " << b << " " << c << endl;
-	}
-};
+template<typename T>
+void printVector(vector<T>& v) {
+    for (int e : v) cout << e << " ";
+    cout << endl;
+}
 
-class Triangle_h {
-public:
-	size_t operator()(const Triangle& t) const {
-		size_t h = 0;
-		h = 19 * h + hash<int>()(t.a);
-		h = 19 * h + hash<int>()(t.b);
-		h = 19 * h + hash<int>()(t.c);
-		return h;
-	}
-};
+template<typename T>
+vector<T> findVector(vector<T>& nums) {
+    int n = nums.size();
+    if (n == 0) return vector<T>();
+
+    vector<T> inc_dp(n, 1);
+    vector<T> dec_dp(n, 1);
+
+    for (int i = 1; i < n; ++i) {
+        for (int j = 0; j < i; ++j) {
+            if (nums[i] > nums[j] && inc_dp[i] < dec_dp[j] + 1) inc_dp[i] = dec_dp[j] + 1;
+            else if (nums[i] < nums[j] && dec_dp[i] < inc_dp[j] + 1) dec_dp[i] = inc_dp[j] + 1;
+        }
+    }
+
+    int maxLength = 1;
+    for (int i = 0; i < n; ++i) maxLength = max(maxLength, max(inc_dp[i], dec_dp[i]));
+
+    vector<T> longestSubsequence;
+    for (int i = 0; i < n; ++i) {
+        if (inc_dp[i] == maxLength || dec_dp[i] == maxLength) {
+            longestSubsequence.push_back(nums[i]);
+            maxLength--;
+        }
+    }
+
+    return longestSubsequence;
+}
 
 int main() {
 
-	unordered_map<Triangle, int, Triangle_h> map;
-	int m = 20;
-	for (int i = 0;i < m;i++) {
-		unordered_map<Triangle, int, Triangle_h>::iterator it;
-		Triangle t = Triangle(rand() % 3, rand() % 3, rand() % 3);
-		it = map.find(t);
-		if (it == map.end()) {
-			cout << 0;
-			map[t] = 1;
-		}
-		else {
-			cout << map[t];
-			map[t] = map[t] + 1;
-		}
-	}
-	
+	vector<int> v = { 1, 1, 2, 2, 2, 3, 2, 2 };
+	vector<int> result = findVector(v);
+
+	printVector(v);
+	printVector(result);
+
 	return 0;
 }
