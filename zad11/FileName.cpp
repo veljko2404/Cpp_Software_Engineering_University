@@ -12,8 +12,8 @@ Izlaz
 
 template<typename T>
 void printVector(vector<T>& v) {
-    for (int e : v) cout << e << " ";
-    cout << endl;
+	for (T e : v) cout << e << " ";
+	cout << endl;
 }
 
 template<typename T>
