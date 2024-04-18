@@ -17,32 +17,47 @@ void printVector(vector<T>& v) {
 }
 
 template<typename T>
-vector<T> findVector(vector<T>& nums) {
-    int n = nums.size();
-    if (n == 0) return vector<T>();
-
-    vector<T> inc_dp(n, 1);
-    vector<T> dec_dp(n, 1);
-
-    for (int i = 1; i < n; ++i) {
-        for (int j = 0; j < i; ++j) {
-            if (nums[i] > nums[j] && inc_dp[i] < dec_dp[j] + 1) inc_dp[i] = dec_dp[j] + 1;
-            else if (nums[i] < nums[j] && dec_dp[i] < inc_dp[j] + 1) dec_dp[i] = inc_dp[j] + 1;
-        }
-    }
-
-    int maxLength = 1;
-    for (int i = 0; i < n; ++i) maxLength = max(maxLength, max(inc_dp[i], dec_dp[i]));
-
-    vector<T> longestSubsequence;
-    for (int i = 0; i < n; ++i) {
-        if (inc_dp[i] == maxLength || dec_dp[i] == maxLength) {
-            longestSubsequence.push_back(nums[i]);
-            maxLength--;
-        }
-    }
-
-    return longestSubsequence;
+vector<T> findVector(vector<T>& v) {
+	vector<T> result;
+	int start = 0, finish = 0, begin = 0, end = 0;
+	for (int i = 0;i < v.size() - 1;i++) {
+		if (i % 2 == 0) {
+			if (v[i] < v[i + 1]) {
+				if (begin == end) {
+					begin = i;
+					end = i + 1;
+				}
+				else end++;
+			}
+			else {
+				if (end - begin > finish - start) {
+					start = begin;
+					finish = end;
+				}
+				begin = i;
+				end = i;
+			}
+		}
+		else {
+			if (v[i] > v[i + 1]) {
+				if (begin == end) {
+					begin = i;
+					end = i + 1;
+				}
+				else end++;
+			}
+			else {
+				if (end - begin > finish - start) {
+					start = begin;
+					finish = end;
+				}
+				begin = i;
+				end = i;
+			}
+		}
+	}
+	for (int i = start;i <= finish;i++) result.push_back(v[i]);
+	return result;
 }
 
 int main() {
